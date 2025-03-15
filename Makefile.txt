@@ -1,0 +1,12 @@
+# Détecte la bonne commande Python
+PYTHON = $(shell command -v python3 2>/dev/null || command -v python)
+
+install:
+	@echo "Installation des dépendances..."
+	$(PYTHON) -m pip install -r requirements.txt
+
+run:
+	@echo "Lancement du serveur..."
+	$(PYTHON) server.py
+
+setup: install run

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='home_styles.css') }}">
+</head>
+
+<header>
+    <nav>
+      <a href="#">Home</a>
+      <a href="#">Mock Community Generator</a>
+      <a href="#">Contact</a>
+    </nav>
+</header>
+
+<body>
+
+
+    <div class="banners-row">
+        <div class="banner">
+            <a href="{{ url_for('page_generator') }}">Access the Mock Community Generator</a>
+        </div>
+
+        <div class="banner">
+            <a>Access the Taxon Sequence Explorer</a>
+        </div>
+    </div>
+
+    <div class="banners-column">
+        <div class="banner">
+            <h2>About this interface</h2>
+            <p>
+            This interface aims to improve the accessibility and reproducibility of metabarcoding analyses, providing scientists with an efficient way to create reference datasets for the validation and optimization of their bioinformatics pipelines.
+            </p>
+        </div>
+
+        <div class="banner">
+            <h2>Presentation Mock Community Generator</h2>
+            <p>
+            It is a tool designed to facilitate the generation of witness communities for uses in metabarcoding. It allows you to retrieve, filter and organize genetic sequences from public databases BOLD .
+
+            The tool also integrates an export system in FASTA format, allowing researchers to use the data generated for in silico analyzes or for the design of laboratory syntheses.
+            </p>
+        </div>
+
+        <div class="banner">
+            <h2>Presentation Taxon Sequence Explorer</h2>
+            <p>
+            This tool makes it possible to find a higher taxonomic level when a species has an insufficient number of genetic sequences. It aggregates the sequences of the parent taxa until a level is identified where the data is significant.
+            </p>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='home_script.js') }}"></script>
+</body>
+</html>

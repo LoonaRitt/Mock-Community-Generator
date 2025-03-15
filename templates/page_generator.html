@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Titre</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+
+
+</head>
+
+<header>
+    <nav>
+    <a href="{{ url_for('home') }}">Home</a>
+      <a href="#">About</a>
+      <a href="#">Contact</a>
+    </nav>
+</header>
+
+
+<body>
+    
+<div id="banner">
+    <h1>Mock Community Generator</h1>
+
+    <div id="top-container">
+
+        <div>
+        <h3>Choose a marker code (optional):</h3>
+        <select id="marker-select">
+            <option value="all">All marker codes</option>
+            <option value="COI-5P">COI-5P</option>
+            <option value="ITS">ITS</option>
+            <option value="16S rRNA">16S rRNA</option>
+            <option value="18S rRNA">18S rRNA</option>
+            <option value="rbcL">rbcL</option>
+            <option value="matK">matK</option>
+        </select>
+        </div>
+
+        <div>
+            <label for="taxonInput" id="TextTaxonInput">Enter a taxon:</label>
+            <input type="text" placeholder="No space at the end of name..." id="taxonInput">
+            <button id="ButtonTaxonInput" onclick="addTaxon()">Add</button>
+        </div>
+
+        <div>
+        <h3>List of taxa:</h3>
+        <ul id="taxonList" class="taxon-list"></ul>
+        </div>
+    </div>
+
+    <label>
+         <input type="checkbox" id="excludeLowSeqCheckbox"> Exclude species with ≤ 3 sequences
+    </label>
+
+    <div class="button-container">
+        <button id="searchButton" onclick="fetchData()">Search</button>
+    </div>
+
+</div>
+
+
+
+<div id="results">
+    <ul id="nucleotides-list"></ul>
+    <ul id="list1-container"></ul>
+</div>
+
+
+<a href="#" class="scroll-to-top" id="scrollToTopBtn">
+&#8593; 
+</a>
+
+
+
+
+    <!-- Ajouter le script Leaflet -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+    </script>
+
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
