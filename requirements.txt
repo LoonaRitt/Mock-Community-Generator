@@ -2,3 +2,4 @@ flask
 requests
 xmltodict
 numpy
+gunicorn
