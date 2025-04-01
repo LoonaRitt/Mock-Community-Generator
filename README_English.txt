@@ -1,116 +1,75 @@
-# Command-Line Tool Setup Guide
+Mock Communities Generator - Command Line Tool
 
-Welcome to the repository of your command-line tool! This guide explains how to install dependencies and launch the server on **Windows**, **Linux**, and **macOS**.
+Online access: https://mock-community-generator.onrender.com/
 
----
 
-## 📁 Project Contents
 
-- `server.py`: Python server based on Flask.
-- `requirements.txt`: List of Python dependencies.
-- `setup_unix.sh`: Installation and launch script for Linux/macOS.
-- `setup_windows.bat`: Installation and launch script for Windows.
-- `Makefile`: Task automation for Linux/macOS.
+Overview:
 
----
+This tool was developed during a student internship in Life Sciences - Population, Genomics, and Evolution track - at Aix-Marseille University, under the supervision of [Name], Associate Professor and co-responsible for the program.
 
-## ⚙️ Prerequisites
-- **Python 3** must be installed on your system.
-- **pip** (Python package manager).
-- For Linux/macOS, ensure the terminal has execution permissions.
 
----
+What is this tool for?
 
-## 🚀 Installation and Launch
+The Mock Communities Generator allows you to generate mock communities for applications in metabarcoding. It uses the BOLD and GBIF APIs to retrieve DNA sequences of the searched taxa.
 
-### 🪟 For Windows
-1. **Open the terminal** (PowerShell or CMD).
-2. **Navigate to the project folder**:
-   ```powershell
-   cd path\to\your\project
-   ```
-3. **Run the script**:
-   ```powershell
-   setup_windows.bat
-   ```
-
-The script will install dependencies and automatically start the server.
+Key Features:
+- Intuitive web interface (local and online).
+- Search and selection of taxon sequences from the BOLD and GBIF databases.
+- Download of sequences in FASTA format.
 
 ---
 
-### 🍎🐧 For macOS/Linux
 
-1. **Open the terminal**.
-2. **Navigate to the project folder**:
-   ```bash
+1️⃣ Local Installation
+
+Prerequisites:
+- Python 3 must be installed.
+- pip (Python package manager).
+
+Installation on Windows:
+1. Open PowerShell or CMD.
+2. Double-click on setup_windows.bat.
+3. The script will install dependencies and automatically start the server.
+
+Installation on macOS/Linux:
+1. Open a terminal.
+2. Navigate to the project folder:
    cd path/to/your/project
-   ```
-
-3. **Option 1: Using `setup_unix.sh`**
-   - Make the script executable (only needed once):
-     ```bash
-     chmod +x setup_unix.sh
-     ```
-   - Then run the script:
-     ```bash
-     ./setup_unix.sh
-     ```
-   
-   👉 *If the script doesn't run, use this instead:*
-   ```bash
+3. Option 1: Use setup_unix.sh
+   chmod +x setup_unix.sh  # (to be executed once)
+   ./setup_unix.sh
+   If the script doesn't work, try:
    bash setup_unix.sh
-   ```
 
-4. **Option 2: Using the `Makefile`** (if `make` is installed)
-   - To install dependencies:
-     ```bash
-     make install
-     ```
-   - To start the server:
-     ```bash
-     make run
-     ```
-   - Or do it all at once:
-     ```bash
-     make setup
-     ```
+4. Option 2: Use Makefile (if make is installed)
+   make install  # Install dependencies
+   make run      # Start the server
+   make setup    # Install + start
 
 ---
 
-## ✅ Verification
-- Once the server is running, a confirmation message will appear.
-- Access the interface via your browser, usually at `http://127.0.0.1:5000`.
+
+2️⃣ Starting the Server
+
+Once installed, open your browser and go to http://127.0.0.1:5000 to use the web interface.
 
 ---
 
-## ❓ Troubleshooting
-- Check if **Python** is installed:
-   ```bash
-   python --version
-   ```
-- If `python` doesn't work, try:
-   ```bash
-   python3 --version
-   ```
-- Ensure that `pip` is installed:
-   ```bash
-   pip --version
-   ```
-- On macOS/Linux, if `setup_unix.sh` doesn't run, check permissions with:
-   ```bash
-   ls -l setup_unix.sh
-   ```
-   and fix them if needed with:
-   ```bash
-   chmod +x setup_unix.sh
-   ```
+
+3️⃣ Project Contents
+
+- server.py: Python server.
+- requirements.txt: List of Python dependencies.
+- setup_windows.bat: Installation script for Windows.
+- setup_unix.sh: Installation script for Linux.
+- Makefile: Task automation for Linux/macOS.
 
 ---
 
-## 🙌 Contribution
-Contributions are welcome! Feel free to open issues or pull requests to improve this project.
 
----
+🙌 Contribution
 
-Thank you for using this tool! 🚀
+Contributions are welcome! If you have ideas for improvement, feel free to open an issue or a pull request.
 
+Thank you for using Mock Communities Generator!
