@@ -1,133 +1,67 @@
-Outil en Ligne de Commande - Mock Communities Generator
+Mock Communities Generator - Outil en Ligne de Commande
 
+Accès en ligne : https://mock-community-generator.onrender.com/
 
 
-🎯 À quoi sert cet outil ?
+Présentation :
 
-Cet outil permet de générer des communautés témoins (mock communities) pour des utilisations en métabarcoding via des API spécialisées (BOLD et GBIF). Il offre une interface web simple et intuitive, accessible localement, pour explorer et visualiser les résultats. Il suffit d'entrer une liste de taxa, puis l'outil sélectionne les séquences les plus pertinentes, téléchargeables au format FASTA.
+Cet outil a été développé lors d’un stage étudiant en L3 Sciences de la Vie - parcours Population, Génomique et Évolution - à Aix-Marseille Université, sous la direction de [Nom], maître de conférences et co-responsable de la formation.
 
-Comment ça fonctionne ?
 
-- Téléchargez le projet.
+À quoi sert cet outil ?
 
-- Exécutez le script correspondant à votre système (Windows ou macOS/Linux).
+Le Mock Communities Generator permet de générer des communautés témoins (mock communities) pour des applications en métabarcoding. Il utilise les API de BOLD et GBIF pour récupérer les séquences d’ADN des taxa recherchés.
 
-- Le serveur s'ouvrira automatiquement dans votre navigateur.
+Fonctionnalités principales :
+- Interface web intuitive (locale et en ligne).
+- Recherche et sélection de séquences de taxon depuis les bases de données BOLD et GBIF.
+- Téléchargement des séquences au format FASTA.
 
-En quelques secondes, vous serez prêt à explorer vos données !
 
+1️⃣ Installation locale
 
-📁 Contenu du projet
+Prérequis :
+- Python 3 doit être installé.
+- pip (gestionnaire de paquets Python).
 
-server.py : Serveur Python basé sur Flask.
+Installation sous Windows :
+1. Ouvrez PowerShell ou CMD.
+2. Double-cliquez sur setup_windows.bat.
+3. Le script installe les dépendances et lance le serveur automatiquement.
 
-requirements.txt : Liste des dépendances Python.
+Installation sous macOS/Linux :
+1. Ouvrez un terminal.
+2. Accédez au dossier du projet :
+   cd chemin/vers/votre/projet
+3. Option 1 : Utiliser setup_unix.sh
+   chmod +x setup_unix.sh  # (à exécuter une seule fois)
+   ./setup_unix.sh
 
-setup_unix.sh : Script d'installation et de lancement pour Linux/macOS.
+   Si le script ne fonctionne pas, essayez :
+   bash setup_unix.sh
 
-setup_windows.bat : Script d'installation et de lancement pour Windows.
+4. Option 2 : Utiliser Makefile (si `make` est installé)
+   make install  # Installation des dépendances
+   make run      # Lancement du serveur
+   make setup    # Installation + lancement
 
-Makefile : Automatisation des tâches pour Linux/macOS.
 
+2️⃣ Lancement du serveur
 
-⚙️ Prérequis
+Une fois installé, ouvrez votre navigateur et accédez à http://127.0.0.1:5000 pour utiliser l’interface web.
 
-Python 3 doit être installé sur votre système.
 
-pip (gestionnaire de paquets Python).
+3️⃣ Contenu du projet
 
-Pour Linux/macOS, assurez-vous que le terminal dispose des permissions d'exécution.
+- server.py : Serveur Python.
+- requirements.txt : Liste des dépendances Python.
+- setup_windows.bat : Script d’installation pour Windows.
+- setup_unix.sh : Script d’installation pour Linux.
+- Makefile : Automatisation des tâches sous Linux/macOS.
 
-
-🚀 Installation et Lancement
-
-🪟 Pour Windows : 
-
-- Ouvrez le terminal (PowerShell ou CMD).
-
-- Naviguez jusqu'au dossier du projet (clique droit sur le dossier contenant ce projet, puis cliquez sur "copier en tant que chemin d'accès") :
-
-  cd chemin\vers\votre\projet
-
-- Exécutez le script :
-
-  setup_windows.bat
-
-- Le script installera les dépendances et lancera automatiquement le serveur.
-
-
-🍎🐧 Pour macOS/Linux
-
-- Ouvrez le terminal.
-
-- Naviguez jusqu'au dossier du projet :
-
-  cd chemin/vers/votre/projet
-
-  
-Option 1 : Utiliser setup_unix.sh
-
-- Rendez le script exécutable (uniquement nécessaire une fois) :
-
-  chmod +x setup_unix.sh
-
-- Ensuite, exécutez le script :
-
-  ./setup_unix.sh
-
-👉 Si le script ne s'exécute pas, essayez :
-
-  bash setup_unix.sh
-
-
-Option 2 : Utiliser le Makefile (si make est installé)
-
-- Pour installer les dépendances :
-
-  make install
-
-- Pour lancer le serveur :
-
-  make run
-
-- Ou tout faire en une seule commande :
-
-  make setup
-  
-
-✅ Vérification
-
-Une fois le serveur lancé, un message de confirmation apparaîtra.
-
-Accédez à l'interface via votre navigateur, à l'adresse http://127.0.0.1:5000
-
-
-❓ Résolution des problèmes
-
-- Vérifiez si Python est installé :
-
-  python --version
-
-- Si python ne fonctionne pas, essayez :
-
-  python3 --version
-
-- Vérifiez que pip est installé :
-
-  pip --version
-
-- Sur macOS/Linux, si setup_unix.sh ne s'exécute pas, vérifiez les permissions avec :
-
-  ls -l setup_unix.sh
-
-- et corrigez-les si nécessaire avec :
-
-  chmod +x setup_unix.sh
-  
 
 🙌 Contribution
 
-Les contributions sont les bienvenues ! N'hésitez pas à ouvrir des issues ou des pull requests pour améliorer ce projet.
+Les contributions sont les bienvenues ! Si vous avez des idées d’amélioration, n’hésitez pas à ouvrir une issue ou une pull request.
 
-Merci d'utiliser cet outil ! 🚀
-
+Merci d’utiliser Mock Communities Generator !
