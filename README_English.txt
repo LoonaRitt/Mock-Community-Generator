@@ -1,7 +1,10 @@
 Mock Communities Generator - Command Line Tool
 
+
 Online access: https://mock-community-generator.onrender.com/
 
+
+The "Access the Taxon Sequence Explorer" tab will be available soon.
 
 
 Overview:
