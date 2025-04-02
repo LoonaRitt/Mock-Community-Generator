@@ -4,6 +4,9 @@ Mock Communities Generator - Outil en Ligne de Commande
 Accès en ligne : https://mock-community-generator.onrender.com/
 
 
+Le chargement de ce lien peut prendre plusieurs minutes.
+
+
 L'onglet "Access the Taxon Sequence Explorer" sera bientôt en ligne.
 
 
