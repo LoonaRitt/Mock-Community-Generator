@@ -12,7 +12,7 @@ L'onglet "Access the Taxon Sequence Explorer" sera bientôt en ligne.
 
 Présentation :
 
-Cet outil a été développé lors d’un stage étudiant en L3 Sciences de la Vie - parcours Population, Génomique et Évolution - à Aix-Marseille Université, sous la direction de [Nom], maître de conférences et co-responsable de la formation.
+Cet outil a été développé lors d’un stage étudiant en L3 Sciences de la Vie - parcours Population, Génomique et Évolution - à Aix-Marseille Université, sous la direction de Emese Meglécz, co-responsable de la formation.
 
 
 À quoi sert cet outil ?
