@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,47 +10,46 @@
 <header>
     <nav>
       <a href="#">Home</a>
-      <a href="#">Mock Community Generator</a>
-      <a href="#">Contact</a>
+      <a href="{{ url_for('page_generator') }}">MCG</a>
+      <a href="{{ url_for('page_generator') }}">TSE</a>
+      <a href="#">About</a>
     </nav>
 </header>
 
 <body>
 
 
+
+
     <div class="banners-row">
-        <div class="banner">
-            <a href="{{ url_for('page_generator') }}">Access the Mock Community Generator</a>
-        </div>
 
-        <div class="banner">
-            <a>Access the Taxon Sequence Explorer</a>
-        </div>
-    </div>
 
-    <div class="banners-column">
-        <div class="banner">
+        <div class="banner banner-1" >
+            <a  href="{{ url_for('page_generator') }}" class="banner-link">
             <h2>About this interface</h2>
             <p>
-            This interface aims to improve the accessibility and reproducibility of metabarcoding analyses, providing scientists with an efficient way to select mock community sequences for the validation and optimization of their bioinformatics pipelines.            
+            This interface aims to improve the accessibility and reproducibility of metabarcoding analyses, providing scientists with an efficient way to select mock community sequences for the validation and optimization of their bioinformatics pipelines.
             </p>
         </div>
 
-        <div class="banner">
-            <h2>Presentation Mock Community Generator</h2>
+        <div class="banner banner-2">
+            <a href="{{ url_for('page_generator') }}" class="banner-link">
+            <h2>Mock Community Generator</h2>
             <p>
-            It is a tool designed to facilitate the generation of mock communities for uses in metabarcoding. It allows you to retrieve, filter and organize genetic sequences from public databases BOLD. The tool also integrates an export system in FASTA format, allowing researchers to use the data for in silico analyzes or for the design of laboratory syntheses.
-            The tool also integrates an export system in FASTA format, allowing researchers to use the data generated for in silico analyzes or for the design of laboratory syntheses.
+            It is a tool designed to facilitate the generation of mock communities for uses in metabarcoding. It allows you to retrieve, filter and organize genetic sequences from public databases BOLD. The tool also integrates an export system in FASTA format, allowing researchers to use the data for in silico analyzes or for the design of laboratory syntheses. The tool also integrates an export system in FASTA format, allowing researchers to use the data generated for in silico analyzes or for the design of laboratory syntheses.
             </p>
         </div>
 
-        <div class="banner">
-            <h2>Presentation Taxon Sequence Explorer</h2>
+        <div class="banner banner-3">
+            <a href="{{ url_for('page_generator') }}" class="banner-link">
+            <h2>Taxon Sequence Explorer</h2>
             <p>
-            This tool makes it possible to explore sequences from a higher taxonomic level when a species has an insufficient number of sequences. It aggregates the sequences of the parent taxa until a level is identified where the data is significant.           
+            This tool makes it possible to explore sequences from a higher taxonomic level when a species has an insufficient number of sequences. It aggregates the sequences of the parent taxa until a level is identified where the data is significant.
             </p>
         </div>
     </div>
+
+<div class="banners-big"></div>
 
     <script src="{{ url_for('static', filename='home_script.js') }}"></script>
 </body>
