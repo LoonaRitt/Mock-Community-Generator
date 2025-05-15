@@ -2,50 +2,63 @@ const taxonList = [];
 
 
 
+// Fonction appelée quand on clique sur "Add"
 function addTaxon() {
-  const taxonInput = document.getElementById('taxonInput').value;
-  console.log('Tentative d\'ajout du taxon :', taxonInput);  
+  const taxonInput = document.getElementById('taxonInput').value.trim();
   if (taxonInput && !taxonList.includes(taxonInput)) {
     taxonList.push(taxonInput);
-    console.log('Taxon ajouté:', taxonInput);
     updateTaxonList();
   }
+  document.getElementById('taxonInput').value = ''; // Réinitialiser le champ
 }
 
-
-// Fonction pour supprimer un taxon de la liste
+// Supprimer un taxon
 function removeTaxon(index) {
   taxonList.splice(index, 1);
   updateTaxonList();
 }
 
-
+// Mettre à jour l'affichage
 function updateTaxonList() {
   const taxonContainer = document.getElementById('taxonList');
-  taxonContainer.innerHTML = ''; // Vide la liste actuelle
-
+  taxonContainer.innerHTML = '';
   taxonList.forEach((taxon, index) => {
     const listItem = document.createElement('li');
     listItem.textContent = taxon;
-    listItem.classList.add('taxon-item'); 
-    taxonContainer.appendChild(listItem);
+    listItem.classList.add('taxon-item');
 
     const removeButton = document.createElement('button');
     removeButton.textContent = 'x';
     removeButton.classList.add('remove-button');
-
     removeButton.onclick = () => removeTaxon(index);
-    
+
     listItem.appendChild(removeButton);
     taxonContainer.appendChild(listItem);
   });
 }
 
+function simulateAdd(taxon) {
+  document.getElementById('taxonInput').value = taxon;
+  document.getElementById('ButtonTaxonInput').click();
+}
 
+// Lecture du fichier texte et ajout automatique
+document.getElementById('fileInput').addEventListener('change', (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
 
+  const reader = new FileReader();
 
+  reader.onload = function(e) {
+    const content = e.target.result;
+    const taxons = content.split(';').map(t => t.trim()).filter(t => t);
+    for (const taxon of taxons) {
+      simulateAdd(taxon); // Simule le remplissage + clic
+    }
+  };
 
-
+  reader.readAsText(file);
+});
 
 
 
@@ -79,16 +92,16 @@ function displayTaxonomy(boldData) {
         speciesNames.add(record.taxonomy?.species?.taxon?.name || "N/A");
     });
 
-    // Construire le HTML avec la classe pour le CSS
     let formattedHTML = '<div class="taxonomy-container">';
-    formattedHTML += "<h5>Taxonomy</h5><ul>";
+    formattedHTML += '<h5 style="text-align: center;">Taxonomy</h5>'; 
+    formattedHTML += '<ul style="text-align: left; padding-left: 1rem;">';
     formattedHTML += `<li><strong>Phylum:</strong> ${[...phylumNames].join(", ")}</li>`;
     formattedHTML += `<li><strong>Class:</strong> ${[...classNames].join(", ")}</li>`;
     formattedHTML += `<li><strong>Order:</strong> ${[...orderNames].join(", ")}</li>`;
     formattedHTML += `<li><strong>Family:</strong> ${[...familyNames].join(", ")}</li>`;
     formattedHTML += `<li><strong>Genus:</strong> ${[...genusNames].join(", ")}</li>`;
     formattedHTML += `<li><strong>Species:</strong> ${[...speciesNames].join(", ")}</li>`;
-    formattedHTML += "</ul></div>";
+    formattedHTML += '</ul></div>';
 
     return formattedHTML;
 }
@@ -97,12 +110,12 @@ function displayTaxonomy(boldData) {
 
 
 function displayData(data) {
-  console.log('Affichage des données', data);  // Log avant de commencer à traiter les données
+  console.log('Affichage des données', data); 
   const resultsContainer = document.getElementById('results');
-  resultsContainer.innerHTML = '';  // Nettoie l'affichage précédent
+  resultsContainer.innerHTML = '';  
 
   data.forEach(({ taxon, boldData, gbifData }) => {
-        console.log('Traitement du taxon:', taxon);  // Log pour chaque taxon traité
+        console.log('Traitement du taxon:', taxon);  
     const taxonSection = document.createElement('div');
     taxonSection.className = 'taxon-section';
 
@@ -133,11 +146,9 @@ function displayData(data) {
     }
 
 
-    // Conteneur global pour toutes les espèces
     const allSpeciesContainer = document.createElement('div');
     allSpeciesContainer.className = 'all-species-container';
 
-    // Pour chaque espèce, créer une sous-section avec un container CSS
     for (const species in speciesData) {
       const speciesSection = document.createElement('div');
       speciesSection.className = 'species-section';
@@ -146,32 +157,26 @@ function displayData(data) {
       speciesTitle.textContent = species;
       speciesSection.appendChild(speciesTitle);
 
-      // Conteneur pour les données BOLD
       const boldContainer = document.createElement('div');
       boldContainer.className = 'bold-container';
 
-      // Ajouter les données taxonomiques et BOLD formatées
       boldContainer.innerHTML += displayTaxonomy({ bold_records: { record: speciesData[species] } });
       boldContainer.innerHTML += formatBoldData({ bold_records: { record: speciesData[species] } });
 
       speciesSection.appendChild(boldContainer);
 
-      // Créer un conteneur pour la section "Localisation"
     const localisationSection = document.createElement('div');
     localisationSection.className = 'localisation-section';
     boldContainer.appendChild(localisationSection);
       
-      // Ajouter un titre à la section "Localisation"
       const localisationTitle = document.createElement('h5');
       localisationTitle.textContent = 'Location';
       localisationSection.appendChild(localisationTitle);
 
-      // Appliquer un style flex pour centrer la section "Localisation" horizontalement
       localisationSection.style.display = 'flex';
-      localisationSection.style.flexDirection = 'column'; // Centrer le contenu verticalement aussi
-      localisationSection.style.alignItems = 'center'; // Centrer horizontalement
+      localisationSection.style.flexDirection = 'column'; 
+      localisationSection.style.alignItems = 'center'; 
 
-      // Ajouter un conteneur de carte avec un style de largeur fixe
       const mapContainer = document.createElement('div');
       mapContainer.className = 'map-container';
       mapContainer.id = `map-${taxon.replace(/\s+/g, '-')}-${species.replace(/\s+/g, '-')}`;
@@ -185,12 +190,11 @@ function displayData(data) {
 
         const map = L.map(mapContainer.id).setView([35, 0], 0);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '&copy; OpenStreetMap contributors'
+          attribution: 'Data from GBIF and BOLD'
         }).addTo(map);
 
-        // Vérifier si on a des données GBIF et des résultats
         if (gbifData && gbifData.results && Array.isArray(gbifData.results)) {
-          let hasPoints = false; // Vérifier s'il y a au moins un point affiché
+          let hasPoints = false; 
 
           gbifData.results.forEach(occurrence => {
             if (occurrence.decimalLatitude && occurrence.decimalLongitude) {
@@ -228,14 +232,12 @@ function displayData(data) {
           records.forEach(record => {
             const speciesInRecord = record.taxonomy?.species?.taxon?.name || "N/A";
 
-            // Filtrer les occurrences BOLD pour afficher seulement celles correspondant à l'espèce actuelle
             if (speciesInRecord.toLowerCase().includes(species.toLowerCase())) {
               const lat = parseFloat(record.collection_event?.coordinates?.lat);
               const lon = parseFloat(record.collection_event?.coordinates?.lon);
 
               if (!isNaN(lat) && !isNaN(lon)) {
 
-                // Ajout d'un cercle bleu pour les points BOLD
                 L.circleMarker([lat, lon], {
                   radius: 3, 
                   color: '#4CAF50',
@@ -247,7 +249,7 @@ function displayData(data) {
             }
           });
         }
-      }, 200); // Délai de 200ms pour s'assurer que tout est bien chargé
+      }, 200); // Délai de 200ms 
     }
 
     taxonSection.appendChild(allSpeciesContainer);
@@ -260,13 +262,16 @@ function displayData(data) {
 
 
 
-let liste1BySpecies = {}; // Stocke une liste1 par espèce
 
-// Fonction pour créer liste1 par espèce
+let liste1BySpecies = {}; 
+
 function createListe1(boldData) {
       console.log('Création de liste1 pour les données BOLD'); 
     const markerSelect = document.getElementById('marker-select');
     const selectedMarker = markerSelect ? markerSelect.value : "all";
+
+    const minLengthInput = document.getElementById("min-length");
+    const minLength = minLengthInput ? parseInt(minLengthInput.value, 10) : 150;
 
     if (!boldData || !boldData.bold_records || !boldData.bold_records.record) {
         console.warn("Aucune donnée BOLD disponible pour créer la liste1.");
@@ -292,6 +297,39 @@ function createListe1(boldData) {
 
         if (record.sequences && Array.isArray(record.sequences.sequence)) {
             record.sequences.sequence.forEach(seq => {
+                if (Array.isArray(seq.nucleotides)) {  
+                    seq.nucleotides.forEach(nucleotide => { 
+                        const markerCode = seq.markercode || "N/A";
+                        const bin = record.bin_uri || "N/A";
+                        const sequence = nucleotide || "N/A";
+
+                        if (sequence !== "N/A" && markerCode !== "N/A" && isValidSequence(sequence)) {
+                            liste1[species].push({ markerCode, bin, sequence });
+                        }
+                    });
+                } else { 
+                    const markerCode = seq.markercode || "N/A";
+                    const bin = record.bin_uri || "N/A";
+                    const sequence = seq.nucleotides || "N/A";
+
+                    if (sequence !== "N/A" && markerCode !== "N/A" && isValidSequence(sequence)) {
+                        liste1[species].push({ markerCode, bin, sequence });
+                    }
+                }
+            });
+        } else if (record.sequences && record.sequences.sequence) {
+            const seq = record.sequences.sequence;
+            if (Array.isArray(seq.nucleotides)) {  
+                seq.nucleotides.forEach(nucleotide => {
+                    const markerCode = seq.markercode || "N/A";
+                    const bin = record.bin_uri || "N/A";
+                    const sequence = nucleotide || "N/A";
+
+                    if (sequence !== "N/A" && markerCode !== "N/A" && isValidSequence(sequence)) {
+                        liste1[species].push({ markerCode, bin, sequence });
+                    }
+                });
+            } else {  
                 const markerCode = seq.markercode || "N/A";
                 const bin = record.bin_uri || "N/A";
                 const sequence = seq.nucleotides || "N/A";
@@ -299,43 +337,38 @@ function createListe1(boldData) {
                 if (sequence !== "N/A" && markerCode !== "N/A" && isValidSequence(sequence)) {
                     liste1[species].push({ markerCode, bin, sequence });
                 }
-            });
-        } else if (record.sequences && record.sequences.sequence) {
-            const markerCode = record.sequences.sequence.markercode || "N/A";
-            const bin = record.bin_uri || "N/A";
-            const sequence = record.sequences.sequence.nucleotides || "N/A";
-
-            if (sequence !== "N/A" && markerCode !== "N/A" && isValidSequence(sequence)) {
-                liste1[species].push({ markerCode, bin, sequence });
             }
         }
     });
 
+
     Object.keys(liste1).forEach(species => {
-        liste1BySpecies[species] = liste1[species];
+        liste1[species] = liste1[species].filter(entry => entry.sequence.length >= minLength);
     });
+
 
     return liste1;
 }
 
 
 
-// Fonction qui vérifie si une séquence ne contient que "a", "t", "g", "c", MAIS ne marche pas !!
-function isValidSequence(sequence) {
-    const validChars = /^[atgc]+$/i; 
-    return validChars.test(sequence);
-}
-
 
 
 function filterAndSelectLongestSequence(liste1, selectedMarker) {
     const excludeLowSeq = document.getElementById("excludeLowSeqCheckbox").checked;
 
+    const minLengthInput = document.getElementById("min-length");
+    const minLength = minLengthInput ? parseInt(minLengthInput.value, 10) : 150;
+
+    liste1 = liste1.filter(entry => entry.sequence && entry.sequence.length >= minLength);
+    if (liste1.length === 0) {
+        return null; // 
+    }
+
     if (selectedMarker !== "all") {
-        // Filtrer par markerCode spécifique
         const filteredList = liste1.filter(entry => entry.markerCode === selectedMarker);
         if (filteredList.length === 0) {
-            return null; // Aucune séquence trouvée pour ce marker
+            return null; 
         }
 
         // Vérifier si l'espèce doit être exclue en fonction du nombre de séquences
@@ -346,7 +379,6 @@ function filterAndSelectLongestSequence(liste1, selectedMarker) {
         // Sélectionner la séquence la plus longue
         return filteredList.reduce((a, b) => (a.sequence?.length || 0) > (b.sequence?.length || 0) ? a : b);
     } else {
-        // Vérifier si tous les BIN sont "N/A"
         const allBinsNA = liste1.every(entry => entry.bin === "N/A");
 
         let filteredList = [];
@@ -401,7 +433,7 @@ function filterAndSelectLongestSequence(liste1, selectedMarker) {
         }
 
         if (filteredList.length === 0) {
-            return null; // Rien à retourner si aucune séquence trouvée
+            return null; 
         }
 
         // Sélectionner la séquence la plus longue
@@ -412,15 +444,19 @@ function filterAndSelectLongestSequence(liste1, selectedMarker) {
 
 
 
+function isValidSequence(sequence) {
+    const regex = /^[ATCG]*$/;
+    return regex.test(sequence);
+}
 
 
-// Liste pour stocker toutes les données de barcode
+
+
 let allBarcodeData = [];
 let speciesSeen = new Set();
 let fastaBlob = null;
 
 
-// Fonction principale pour traiter les données BOLD et afficher la séquence la plus longue
 function formatBoldData(boldData) {
     if (!boldData || !boldData.bold_records || !boldData.bold_records.record) {
         return "<p>Aucune donnée BOLD disponible.</p>";
@@ -436,17 +472,62 @@ function formatBoldData(boldData) {
     records.forEach(record => {
         const species = record.taxonomy?.species?.taxon?.name || "N/A";
         
-
         if (!speciesData[species]) {
             speciesData[species] = [];
         }
-        speciesData[species].push({
-            bin: record.bin_uri || "N/A",
-            markerCode: record.sequences?.sequence?.markercode || "N/A",
-            sequence: record.sequences?.sequence?.nucleotides || "",
-            sequenceID: record.sequences?.sequence?.sequenceID || "",
-            genbank_accession: record.sequences?.sequence?.genbank_accession || "N/A",
+
+    const sequences = record.sequences?.sequence;
+
+    if (Array.isArray(sequences)) {
+        sequences.forEach(seq => {
+            let nucleotides = seq.nucleotides || "";
+            if (Array.isArray(nucleotides)) {
+                nucleotides.forEach(nuc => {
+                    const cleanedSequence = nuc.replace(/-/g, "");
+                    speciesData[species].push({
+                        bin: record.bin_uri || "N/A",
+                        markerCode: seq.markercode || "N/A",
+                        sequence: cleanedSequence,
+                        sequenceID: seq.sequenceID || "",
+                        genbank_accession: seq.genbank_accession || "N/A",
+                    });
+                });
+            } else {
+                const cleanedSequence = nucleotides.replace(/-/g, "");
+                speciesData[species].push({
+                    bin: record.bin_uri || "N/A",
+                    markerCode: seq.markercode || "N/A",
+                    sequence: cleanedSequence,
+                    sequenceID: seq.sequenceID || "",
+                    genbank_accession: seq.genbank_accession || "N/A",
+                });
+            }
         });
+    } else if (sequences) {
+        let nucleotides = sequences.nucleotides || "";
+        if (Array.isArray(nucleotides)) {
+            nucleotides.forEach(nuc => {
+                const cleanedSequence = nuc.replace(/-/g, "");
+                speciesData[species].push({
+                    bin: record.bin_uri || "N/A",
+                    markerCode: sequences.markercode || "N/A",
+                    sequence: cleanedSequence,
+                    sequenceID: sequences.sequenceID || "",
+                    genbank_accession: sequences.genbank_accession || "N/A",
+                });
+            });
+        } else {
+            const cleanedSequence = nucleotides.replace(/-/g, "");
+            speciesData[species].push({
+                bin: record.bin_uri || "N/A",
+                markerCode: sequences.markercode || "N/A",
+                sequence: cleanedSequence,
+                sequenceID: sequences.sequenceID || "",
+                genbank_accession: sequences.genbank_accession || "N/A",
+            });
+        }
+    }
+
     });
 
     Object.keys(speciesData).forEach(species => {
@@ -455,11 +536,8 @@ function formatBoldData(boldData) {
         const selectedMarker = markerSelect ? markerSelect.value : "all";
         const longestEntry = filterAndSelectLongestSequence(liste1, selectedMarker);
 
-
-        // Vérification : est-ce que tous les markerCode sont "N/A" ?
         const allMarkerCodesNA = liste1.every(entry => entry.markerCode === "N/A");
 
-        // Regrouper les séquences par markerCode et BIN
         const groupedData = {};
         liste1.forEach(({ markerCode, bin, sequence }) => {
             const key = `${markerCode}-${bin}`;
@@ -473,8 +551,6 @@ function formatBoldData(boldData) {
             groupedData[key].sequences.push(sequence);
         });
 
-
-        // Construire le tableau "Présentation des séquences"
         let presentationTable = `
            <div class="sequences-container">
             <h5>Sequence summary</h5>
@@ -486,14 +562,13 @@ function formatBoldData(boldData) {
                         <th style="padding: 10px;">Number of unique sequences</th>
                     </tr>`;
 
-        // Trier les données par markerCode par ordre alphabétique
         const sortedData = Object.values(groupedData).sort((a, b) => {
             return a.markerCode.localeCompare(b.markerCode);
         });
 
         sortedData.forEach(({ markerCode, bin, sequences }) => {
             const uniqueSequences = [...new Set(sequences)];
-         presentationTable += `
+            presentationTable += `
         <tr>
             <td style="padding: 10px;">${markerCode}</td>
             <td style="padding: 10px;">${bin}</td>
@@ -504,7 +579,6 @@ function formatBoldData(boldData) {
 
         presentationTable += `</table></div>`;
 
-        // Ajout du tableau à la sortie HTML
         formattedHTML += presentationTable;
 
         if (allMarkerCodesNA) {
@@ -513,7 +587,7 @@ function formatBoldData(boldData) {
                     <h5>Representative barcode</h5>
                     <p>No marker code associated to ${species}.</p>
                 </div>`;
-            return; // On passe à l'espèce suivante
+            return; 
         }
 
         if (longestEntry === null) {
@@ -525,8 +599,6 @@ function formatBoldData(boldData) {
             return; 
         }
 
-
-        // Si une séquence a été trouvée, afficher les détails
         const { sequence, markerCode, bin, genbank_accession, sequenceID } = longestEntry;
 
         const formattedSpecies = species.toLowerCase().replace(/\s+/g, "_");
@@ -540,14 +612,11 @@ function formatBoldData(boldData) {
             sequenceID: longestEntry.sequenceID
         };
 
-        // Vérifier si l'espèce est déjà présente dans allBarcodeData
         const existingIndex = allBarcodeData.findIndex(entry => entry.species === species);
 
         if (existingIndex !== -1) {
-            // Remplacer l'ancienne entrée par la nouvelle
             allBarcodeData[existingIndex] = newEntry;
         } else {
-            // Ajouter une nouvelle entrée si l'espèce n'existe pas encore
             allBarcodeData.push(newEntry);
         }
 
@@ -560,8 +629,11 @@ function formatBoldData(boldData) {
                     <li class="barcode-item"><strong>Genbank accession :</strong> ${longestEntry.genbank_accession}</li>
                 </ul>
                 <ul class="barcode-list-sequence" style="list-style-type: none; padding: 0;">
-                    <li style="word-wrap: break-word; white-space: normal;">
-                        <strong>Sequence :</strong> ${longestEntry.sequence}
+                    <li>
+                        <strong>Sequence :</strong>
+                        <div style="text-align: left; font-size: 0.85rem; margin-top: 1rem; word-wrap: break-word; white-space: normal;">
+                         ${longestEntry.sequence}
+                         </div>
                     </li>
                 </ul>
             </div>`;
@@ -569,7 +641,8 @@ function formatBoldData(boldData) {
 
     // Convertir en FASTA
     const fastaData = allBarcodeData.map(entry => {
-        return `>${entry.species} | ${entry.sequenceID} | ${entry.markerCode} | ${entry.bin} | ${entry.genbank_accession}\n${entry.sequence}`;
+       const speciesFormatted = entry.species.charAt(0).toUpperCase() + entry.species.slice(1);
+       return `>${speciesFormatted} | ${entry.sequenceID} | ${entry.markerCode} | ${entry.bin} | ${entry.genbank_accession}\n${entry.sequence}`;
     }).join('\n\n');
 
     fastaBlob = new Blob([fastaData], { type: "text/plain" });
@@ -582,43 +655,11 @@ function formatBoldData(boldData) {
 
 
 
-function findMinDistanceSequence(liste1) {
-    let minDistance = Infinity;
-    let closestSequence = null;
-    let speciesName = '';
-
-    // Comparer chaque séquence avec toutes les autres
-    for (const species in liste1) {
-        const sequences = liste1[species];
-
-        sequences.forEach((seq1, index) => {
-            for (let i = index + 1; i < sequences.length; i++) {
-                const seq2 = sequences[i];
-                const distance = calculateSequenceDistance(seq1.sequence, seq2.sequence);
-
-                // Mettre à jour la séquence la plus proche si nécessaire
-                if (distance < minDistance) {
-                    minDistance = distance;
-                    closestSequence = seq1;
-                    speciesName = species;
-                }
-            }
-        });
-    }
-}
-
-// Appeler cette fonction après avoir récupéré toutes les séquences et les avoir mises dans liste1
-findMinDistanceSequence(liste1BySpecies);
-
-
-
-
 
 
 
 // Fonction pour récupérer les données depuis le serveur Python
 async function fetchData() {
-        console.log("📡 fetchData() appelée !");
       allBarcodeData = [];
     speciesSeen.clear();
     fastaBlob = null;
@@ -675,26 +716,6 @@ mybutton.addEventListener("click", function(e) {
 
 
 
-
-
-
-// Indicateur de chargement dans le HTML
-const loadingIndicator = document.createElement('div');
-loadingIndicator.id = 'loadingIndicator';
-loadingIndicator.style.display = 'none';
-loadingIndicator.style.marginTop = '10px';
-loadingIndicator.style.marginLeft = '14px';
-loadingIndicator.style.padding = '10px';
-loadingIndicator.style.backgroundColor = 'rgba(233, 250, 237, 0.8)';
-loadingIndicator.style.color = 'black';
-loadingIndicator.style.borderRadius = '5px';
-loadingIndicator.style.fontSize = '16px';
-loadingIndicator.innerText = 'Loading data...';
-
-// Insérer l'indicateur après le bouton "Rechercher"
-const Button = document.getElementById('searchButton');
-searchButton.parentNode.insertBefore(loadingIndicator, searchButton.nextSibling);
-
 // Création du conteneur pour les boutons
 const buttonsContainer = document.createElement('div');
 buttonsContainer.style.display = 'flex';
@@ -702,56 +723,56 @@ buttonsContainer.style.justifyContent = 'space-between';
 buttonsContainer.style.width = '100%';
 buttonsContainer.style.marginTop = '10px';
 
-
-// Création du bouton "Télécharger fichier FASTA"
 const downloadButton = document.createElement('button');
 downloadButton.id = 'downloadButton';
-downloadButton.classList.add('download-button'); // Ajout de la classe
-downloadButton.style.display = 'none'; // Caché par défaut
-downloadButton.innerText = 'Download FASTA file';
+downloadButton.classList.add('download-button');
+downloadButton.style.display = 'none'; 
+downloadButton.title = ""; // <- ici
 
+downloadButton.innerHTML = `
+  <span class="button-text">Download FASTA file</span>
+  <span class="spinner" style="display: none;"></span>
+  <span class="tooltip-container">
+    <span class="help-icon">?</span>
+    <span class="tooltip-text">Loading may take several minutes. The FASTA file has the following format: >species | sequenceID | markerCode | bin | genbank_accession</span>
+`;
 
-// Ajouter un gestionnaire d'événements pour le téléchargement
 downloadButton.addEventListener('click', () => {
-    if (fastaBlob) {
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(fastaBlob);
-        a.download = "Mock_Community.fasta";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-    } else {
-        alert("Aucune donnée à télécharger !");
-    }
+  if (fastaBlob) {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(fastaBlob);
+    a.download = "Mock_Community.fasta";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  } else {
+    alert("Aucune donnée à télécharger !");
+  }
 });
 
-
-// Insérer les boutons dans le conteneur
 buttonsContainer.appendChild(downloadButton);
 
-// Insérer le conteneur après l'indicateur de chargement
-loadingIndicator.parentNode.insertBefore(buttonsContainer, loadingIndicator.nextSibling);
+const searchButton = document.getElementById('searchButton');
+searchButton.parentNode.insertBefore(buttonsContainer, searchButton.nextSibling);
 
-// Fonction pour afficher l'indicateur de chargement
 function showLoadingIndicator() {
-  loadingIndicator.style.display = 'block';
-  downloadButton.style.display = 'none'; // Cacher le bouton de téléchargement pendant le chargement
+  downloadButton.style.display = 'inline-flex';
+  downloadButton.querySelector('.button-text').style.display = 'none';
+  downloadButton.querySelector('.spinner').style.display = 'inline-block';
+  downloadButton.disabled = true;
 }
 
-// Fonction pour cacher l'indicateur de chargement
 function hideLoadingIndicator() {
-  loadingIndicator.style.display = 'none';
-  downloadButton.style.display = 'block'; // Afficher une fois le chargement terminé
+  downloadButton.querySelector('.spinner').style.display = 'none';
+  downloadButton.querySelector('.button-text').style.display = 'inline';
+  downloadButton.disabled = false;
 }
 
-// Modification de la fonction pour exécuter la recherche avec l'indicateur de chargement
 searchButton.onclick = () => {
   showLoadingIndicator();
   fetchData().finally(() => {
     hideLoadingIndicator();
   });
 };
-
-
 
 
