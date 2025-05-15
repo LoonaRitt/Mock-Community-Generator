@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Titre</title>
+  <title>MCG</title>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -16,7 +16,6 @@
     <nav>
     <a href="{{ url_for('home') }}">Home</a>
       <a href="#">About</a>
-      <a href="#">Contact</a>
     </nav>
 </header>
 
@@ -35,18 +34,40 @@
             <option value="COI-5P">COI-5P</option>
             <option value="COI-3P">COI-3P</option>
             <option value="ITS">ITS</option>
-            <option value="16S rRNA">16S rRNA</option>
-            <option value="18S rRNA">18S rRNA</option>
+            <option value="ITS1">ITS1</option>
+            <option value="ITS2">ITS2</option>
+            <option value="12S">12S rRNA</option>
+            <option value="16S">16S rRNA</option>
+            <option value="18S">18S rRNA</option>
+            <option value="18S-5P">18S-5P rRNA</option>
+            <option value="28S">28S rRNA</option>
             <option value="rbcL">rbcL</option>
             <option value="matK">matK</option>
         </select>
         </div>
 
         <div>
-            <label for="taxonInput" id="TextTaxonInput">Enter a taxon:</label>
-            <input type="text" placeholder="No space at the end of name..." id="taxonInput">
-            <button id="ButtonTaxonInput" onclick="addTaxon()">Add</button>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <label for="taxonInput" id="TextTaxonInput">Enter a taxon:</label>
+              <div class="tooltip">
+                <span class="tooltip-icon">?</span>
+                <div class="tooltip-text">
+                  You can enter a taxon manually and click 'Add', or upload a .txt file containing a list of taxa separated by semicolons ';'
+                </div>
+              </div>
+            </div>
+
+            <input type="text" placeholder="Enter a taxon and click 'Add' " id="taxonInput">
+
+
+          <div>
+           <label for="fileInput" id="TextFileInput"></label>
+          <input type="file" id="fileInput" accept=".txt">
+         </div>
+
+          <button id="ButtonTaxonInput" onclick="addTaxon()">Add</button>
         </div>
+
 
         <div>
         <h3>List of taxa:</h3>
@@ -54,13 +75,28 @@
         </div>
     </div>
 
-    <label>
-         <input type="checkbox" id="excludeLowSeqCheckbox"> Exclude species with ≤ 3 sequences
-    </label>
+
+
+
+
+
+<div id="parametre">
+  <label style="display: flex; align-items: left;">
+    <input type="checkbox" id="excludeLowSeqCheckbox" style="margin-right: 8px;">
+    Exclude species with ≤ 3 sequences
+  </label>
+
+  <label for="min-length" style="display: flex; align-items: center;">
+    Minimum sequence length :
+    <input type="number" id="min-length" value="150" min="1" step="1" style="margin-left: 8px; width: 50px">
+  </label>
+</div>
+
 
     <div class="button-container">
         <button id="searchButton" onclick="fetchData()">Search</button>
     </div>
+<div id="liste1"></div>
 
 </div>
 
