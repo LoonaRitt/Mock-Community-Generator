@@ -15,7 +15,8 @@
 <header>
     <nav>
     <a href="{{ url_for('home') }}">Home</a>
-      <a href="#">About</a>
+      <a href="{{ url_for('page_explorer') }}">TSE</a>
+      <a href="{{ url_for('page_about') }}">About</a>
     </nav>
 </header>
 
@@ -28,9 +29,8 @@
     <div id="top-container">
 
         <div>
-        <h3>Choose a marker code (optional):</h3>
+        <h3>Select marker code:</h3>
         <select id="marker-select">
-            <option value="all">All marker codes</option>
             <option value="COI-5P">COI-5P</option>
             <option value="COI-3P">COI-3P</option>
             <option value="ITS">ITS</option>
@@ -52,7 +52,7 @@
               <div class="tooltip">
                 <span class="tooltip-icon">?</span>
                 <div class="tooltip-text">
-                  You can enter a taxon manually and click 'Add', or upload a .txt file containing a list of taxa separated by semicolons ';'
+                  You can enter a taxon manually and click “Add”, or upload a .txt file containing a list of taxa, with one taxon per line.
                 </div>
               </div>
             </div>
