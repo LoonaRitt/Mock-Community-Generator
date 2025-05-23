@@ -11,8 +11,8 @@
     <nav>
       <a href="#">Home</a>
       <a href="{{ url_for('page_generator') }}">MCG</a>
-      <a href="{{ url_for('page_generator') }}">TSE</a>
-      <a href="#">About</a>
+      <a href="{{ url_for('page_explorer') }}">TSE</a>
+      <a href="{{ url_for('page_about') }}">About</a>
     </nav>
 </header>
 
@@ -25,7 +25,7 @@
 
 
         <div class="banner banner-1" >
-            <a  href="{{ url_for('page_generator') }}" class="banner-link">
+            <a  href="{{ url_for('page_about') }}" class="banner-link">
             <h2>About this interface</h2>
             <p>
             This interface aims to improve the accessibility and reproducibility of metabarcoding analyses, providing scientists with an efficient way to select mock community sequences for the validation and optimization of their bioinformatics pipelines.
@@ -41,7 +41,7 @@
         </div>
 
         <div class="banner banner-3">
-            <a href="{{ url_for('page_generator') }}" class="banner-link">
+            <a href="{{ url_for('page_explorer') }}" class="banner-link">
             <h2>Taxon Sequence Explorer</h2>
             <p>
             This tool makes it possible to explore sequences from a higher taxonomic level when a species has an insufficient number of sequences. It aggregates the sequences of the parent taxa until a level is identified where the data is significant.
