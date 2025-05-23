@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TSE</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='explorer_styles.css') }}">
+
+</head>
+
+
+<header>
+    <nav>
+    <a href="{{ url_for('home') }}">Home</a>
+      <a href="{{ url_for('page_generator') }}">MCG</a>
+      <a href="{{ url_for('page_about') }}">About</a>
+    </nav>
+</header>
+
+
+
+<body>
+  <div id="banner">
+    <h1>Taxon Sequence Explorer</h1>
+
+<div id="parametre">
+  
+  <div>
+  <h3>Sort by:</h3>
+  <select id="sortSelect">
+    <option value="alpha" id="sortByAlpha">Alphabetical Order (A–Z)</option>
+    <option value="sequenceCount" id="sortBySeq">Sequence Count (Descending)</option>
+  </select>
+  </div>
+
+  <div>
+    <h3>Search taxon:</h3>
+    <input type="text" id="taxonInput" placeholder="Enter a Specie, Genus, Family, Order, ..." />
+  </div>
+
+        <div>
+        <h3>Select markercode:</h3>
+        <select id="marker-select">
+            <option value="all">All marker codes</option>
+            <option value="COI-5P">COI-5P</option>
+            <option value="COI-3P">COI-3P</option>
+            <option value="ITS">ITS</option>
+            <option value="ITS1">ITS1</option>
+            <option value="ITS2">ITS2</option>
+            <option value="12S">12S rRNA</option>
+            <option value="16S">16S rRNA</option>
+            <option value="18S">18S rRNA</option>
+            <option value="18S-5P">18S-5P rRNA</option>
+            <option value="28S">28S rRNA</option>
+            <option value="rbcL">rbcL</option>
+            <option value="matK">matK</option>
+        </select>
+        </div>
+
+</div>
+
+    <button id="searchButton">Search</button>
+
+    <div id="loadingSpinner" style="display: none; margin-top: 10px; text-align: center;">
+      <div class="spinner"></div>
+    </div>
+
+    <button onclick="downloadListAsTxt()">Download the list (.txt)</button>
+
+    <h2>This list can be used on the Mock Community Generator page to associate the most representative sequence with each taxon.</h2>
+
+    <h2>To add taxa to the list, simply click on the name of a genus or species. If its name appears in green in the tree, it is included in the list. To remove a taxon, just click on its name again.</h2>
+  </div>
+  </div>
+
+
+  <div id="banner">
+  <div id="taxonomyTree"></div>
+  </div>
+  
+
+
+  <script src="{{ url_for('static', filename='explorer_script.js') }}"></script>
+
+</body>
+</html>

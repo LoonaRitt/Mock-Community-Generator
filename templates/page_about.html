@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='about_styles.css') }}">
+
+</head>
+
+<body>
+
+
+  <header>
+
+    <div class="menu">
+    <nav>
+    <a href="{{ url_for('home') }}">Home</a>
+      <a href="{{ url_for('page_generator') }}">MCG</a>
+      <a href="{{ url_for('page_explorer') }}">TSE</a>
+    </nav>
+    </div>
+
+    <h1>Workflows</h1>
+  </header>
+
+    <div class="sidebar">
+  <nav>
+    <ul>
+      <li><a href="#workflow1">TSE</a></li>
+      <li><a href="#workflow2">MCG</a></li>
+      <li><a href="#workflow3">Server</a></li>
+    </ul>
+  </nav>
+</div>
+
+  <main class="workflow-container">
+
+    <section id="workflow1" class="workflow-card">
+      <h2>Taxon Sequence Explorer (TSE) </h2>
+
+      <h3>Introduction: </h3>
+      <p>This code is designed to search for and display a taxonomic tree based on a taxon entered by the user (ranging from Phylum to Species). It retrieves data via the BOLD Systems API and builds a hierarchical representation of the taxa, including the number of associated sequences, filtered by a selected genetic marker. The interface also offers interaction features, such as selecting elements (taxon names on the tree) to download them as a list in .txt format. This file can then be uploaded to the Mock Community Generator page to associate the most representative sequence with each taxon in the list.</p>
+
+      <h3>Workflow Summary: </h3>
+      <p>1. The user enters a taxon, a marker code, and selects the sorting order for taxa at each taxonomic rank (alphabetical or descending order based on sequence count). If the user enters a species name, the search will be performed for the associated genus, and the species name will be highlighted in blue in the taxonomic tree.</p>
+
+      <p>2. The script queries the BOLD API to retrieve sequences (and associated marker codes) linked to each species within the searched taxon, as well as their taxonomic classification.</p>
+
+      <p>3. It builds a taxonomic hierarchy and structures this data into a nested taxonomic tree.</p>
+
+      <p>4. It calculates statistics on the number of sequences per genus and family based on the number of sequences associated with each species. Two main functions, countSequencesPerGenus and countSequencesPerFamily, count the number of available sequences per genus and family. If the global total of sequences is zero (no sequences retrieved), a pop-up notifies the user and suggests launching the search again with a higher-rank taxon.</p>
+
+      <p>5. The function renderTaxonomyTree visually displays the taxonomic tree with the number of sequences per Species, Genus, and Family (if the search involves a Family or higher taxonomic rank). It traverses the nested hierarchy to structure the display interactively. The user can interact with the tree to select taxa (selected taxa appear in green), hide or show branches, sort results, and export the selection in .txt format to use it on the Mock Community Generator page.
+      </p>
+
+    </section>
+
+
+    <section id="workflow2" class="workflow-card">
+      <h2>Mock Community Generator (MCG)</h2>
+      
+      <h3>Introduction: </h3>
+      <p>This page allows the automatic extraction, filtering, and organization of DNA sequences from the BOLD and GBIF databases, based on a selected genetic marker and a provided list of taxa. The tool offers qualitative filters (minimum number of sequences, minimum length) and groups data by species. It integrates taxonomic classification, occurrence mapping, sequence filtering and alignment, as well as the selection of a representative barcode per species. As output, a downloadable FASTA file gathers sequences ready for analysis.</p>
+
+      <h3>Workflow Input: </h3>
+      <p>1. Select a genetic marker from a dropdown list. This marker represents a targeted DNA region (e.g., COI, ITS, rbcL...) intended to retrieve sequences from the databases. This step filters sequences according to the type of genetic study planned (animals, plants, fungi…).</p>
+
+      <p>2. Add one or more taxa (species names, genera, families, etc.). This can be done manually by typing a taxon name into the designated field and clicking the “Add” button to include it in the search list. This feature allows adding multiple taxa successively. It is also possible to upload a text file containing several taxa, each separated by a line break.</p>
+
+      <p>3. The interface also provides two optional parameters to refine the search:</p>
+      <ul>
+        <li>
+          A checkbox that automatically excludes species for which only a very small number of sequences (3 or fewer) exist.
+          This helps avoid unreliable or underrepresented results in the databases.
+        </li>
+        <li>
+          A minimum length setting for the DNA sequences to retrieve.
+          This helps eliminate sequences that are too short, often less informative or potentially incomplete.
+        </li>
+      </ul>
+
+      <p>4. Once all elements are defined, click the “search” button to start the query. The application then retrieves data from the BOLD and GBIF APIs based on the taxa, the selected marker, and the chosen parameters.</p>
+
+      <h3>Workflow Summary: </h3>
+      <p>1. Data Pre-processing: <br>
+      The function fetchData() is called to retrieve data from the Python server for each taxon in taxonList. The returned data contains two sections:
+      <ul>
+        <li>
+      BOLD: Information about sequences (as well as associated data: markercode, BIN, and GenBank accession), taxonomy, and geographic coordinates of the samples.
+              </li>
+              <li>
+      GBIF: Geographic occurrences.
+              </li>
+            </ul>
+      These data are sorted by species and stored in a combinedData table to be used later.</p>
+
+      <p>2. “Taxonomy” Block:<br>
+      For each scientific name matching the queried taxon, the full hierarchical classification — Phylum, Class, Order, Family, Genus, and Species — is retrieved via BOLD data.</p>
+
+      <p>3. “Location” Block:<br>
+      Display locations on a map (Leaflet) by adding GBIF and BOLD points from the coordinates associated with each species.</p>
+
+      <p>4. “Sequence Summary” Block:<br>
+<ol type="a">
+  <li>
+    For each species, only sequences matching the selected markercode are considered.
+  </li>
+  <li>
+    Sequence Filtering:
+    <ul>
+      <li>Remove gaps and keep only sequences composed of A, T, C, G.</li>
+      <li>Remove sequences that are too short (&lt; minLength, 150 bp by default).</li>
+    </ul>
+  </li>
+  <li>
+    Group sequences associated with the same BIN.
+  </li>
+  <li>
+    Align the sequences to identify redundancies.
+  </li>
+  <li>
+    Display the “Sequence Summary” table.
+  </li>
+</ol>
+</p>
+      <p>5. “Representative Barcode” Block:<br>
+      From the "Sequence Summary" workflow, the longest sequence among the BIN containing the most sequences is selected.<br>
+      If the option is checked, no representative sequence is selected for species with ≤ 3 sequences.</p>
+      <p>6. FASTA File:<br>
+      Gathers all representative sequences for each species associated with the query and formats them into a FASTA file. This downloadable file contains, for each sequence, a header specifying the specimen ID and species name, followed by the nucleotide sequence itself.</p>
+
+
+
+    </section>
+
+
+    <section id="workflow3" class="workflow-card">
+      <h2>Python Server</h2>
+<p>This Flask server queries the GBIF and BOLD APIs to retrieve and merge taxonomic data, occurrences, and genetic sequence information on requested taxa, in order to provide these data for the web interface.</p>
+
+<ol>
+  <li>To retrieve data from GBIF:
+    <ol type="a">
+      <li><code>https://api.gbif.org/v1/species/match?name={taxon}</code>: to obtain the usageKey of the taxon.</li>
+      <li><code>https://api.gbif.org/v1/occurrence/search?taxon_key={usageKey}&limit=400</code>: to retrieve occurrences of the taxon.</li>
+    </ol>
+  </li>
+
+  <li>To retrieve data from BOLD Systems:
+    <ol type="a">
+      <li><code>https://v4.boldsystems.org/index.php/API_Public/combined?taxon={taxon}</code>: to retrieve DNA barcode sequences (with associated data), taxonomic information, and sample coordinates.</li>
+      <li>These data are retrieved in XML format and converted to JSON.</li>
+    </ol>
+  </li>
+
+  <li>All these data are structured, merged, and returned as a JSON response for the <code>script.js</code> of the pages associated with the tool.</li>
+</ol>
+
+    </section>
+
+  </main>
+
+  <script>
+  window.onload = function () {
+    if (window.location.hash) {
+      window.scrollTo(0, 0);
+      history.replaceState("", document.title, window.location.pathname + window.location.search);
+    }
+  };
+</script>
+
+</body>
+</html>
