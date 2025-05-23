@@ -9,7 +9,7 @@ function addTaxon() {
     taxonList.push(taxonInput);
     updateTaxonList();
   }
-  document.getElementById('taxonInput').value = ''; // Réinitialiser le champ
+  document.getElementById('taxonInput').value = '';
 }
 
 // Supprimer un taxon
@@ -42,7 +42,8 @@ function simulateAdd(taxon) {
   document.getElementById('ButtonTaxonInput').click();
 }
 
-// Lecture du fichier texte et ajout automatique
+
+// Liste ajout
 document.getElementById('fileInput').addEventListener('change', (event) => {
   const file = event.target.files[0];
   if (!file) return;
@@ -51,14 +52,15 @@ document.getElementById('fileInput').addEventListener('change', (event) => {
 
   reader.onload = function(e) {
     const content = e.target.result;
-    const taxons = content.split(';').map(t => t.trim()).filter(t => t);
+    const taxons = content.split(/\r?\n/).map(t => t.trim()).filter(t => t);
     for (const taxon of taxons) {
-      simulateAdd(taxon); // Simule le remplissage + clic
+      simulateAdd(taxon); 
     }
   };
 
   reader.readAsText(file);
 });
+
 
 
 
@@ -263,91 +265,97 @@ function displayData(data) {
 
 
 
-let liste1BySpecies = {}; 
-
 function createListe1(boldData) {
-      console.log('Création de liste1 pour les données BOLD'); 
-    const markerSelect = document.getElementById('marker-select');
-    const selectedMarker = markerSelect ? markerSelect.value : "all";
+  console.log('Création de liste1 pour les données BOLD'); 
+  const markerSelect = document.getElementById('marker-select');
+  if (!markerSelect) {
+    alert("Marker select element not found.");
+    return {};
+  }
 
-    const minLengthInput = document.getElementById("min-length");
-    const minLength = minLengthInput ? parseInt(minLengthInput.value, 10) : 150;
+  const selectedMarker = markerSelect.value;
+  
+  if (!selectedMarker) {
+    alert("Select a markercode");
+    return {};
+  }
 
-    if (!boldData || !boldData.bold_records || !boldData.bold_records.record) {
-        console.warn("Aucune donnée BOLD disponible pour créer la liste1.");
-        return {};
+  const minLengthInput = document.getElementById("min-length");
+  const minLength = minLengthInput ? parseInt(minLengthInput.value, 10) : 150;
+
+  if (!boldData || !boldData.bold_records || !boldData.bold_records.record) {
+    console.warn("Aucune donnée BOLD disponible pour créer la liste1.");
+    return {};
+  }
+
+  const records = Array.isArray(boldData.bold_records.record)
+    ? boldData.bold_records.record
+    : [boldData.bold_records.record];
+
+  let liste1 = {}; 
+
+  records.forEach(record => {
+    const species = record.taxonomy?.species?.taxon?.name || "N/A";
+
+    if (species === "N/A") {
+      return; 
     }
 
-    const records = Array.isArray(boldData.bold_records.record)
-        ? boldData.bold_records.record
-        : [boldData.bold_records.record];
+    if (!liste1[species]) {
+      liste1[species] = [];
+    }
 
-    let liste1 = {}; 
+    if (record.sequences && Array.isArray(record.sequences.sequence)) {
+      record.sequences.sequence.forEach(seq => {
+        if (Array.isArray(seq.nucleotides)) {  
+          seq.nucleotides.forEach(nucleotide => { 
+            const markerCode = seq.markercode || "N/A";
+            const bin = record.bin_uri || "N/A";
+            const sequence = nucleotide || "N/A";
 
-    records.forEach(record => {
-        const species = record.taxonomy?.species?.taxon?.name || "N/A";
-
-        if (species === "N/A") {
-            return; 
-        }
-
-        if (!liste1[species]) {
-            liste1[species] = [];
-        }
-
-        if (record.sequences && Array.isArray(record.sequences.sequence)) {
-            record.sequences.sequence.forEach(seq => {
-                if (Array.isArray(seq.nucleotides)) {  
-                    seq.nucleotides.forEach(nucleotide => { 
-                        const markerCode = seq.markercode || "N/A";
-                        const bin = record.bin_uri || "N/A";
-                        const sequence = nucleotide || "N/A";
-
-                        if (sequence !== "N/A" && markerCode !== "N/A" && isValidSequence(sequence)) {
-                            liste1[species].push({ markerCode, bin, sequence });
-                        }
-                    });
-                } else { 
-                    const markerCode = seq.markercode || "N/A";
-                    const bin = record.bin_uri || "N/A";
-                    const sequence = seq.nucleotides || "N/A";
-
-                    if (sequence !== "N/A" && markerCode !== "N/A" && isValidSequence(sequence)) {
-                        liste1[species].push({ markerCode, bin, sequence });
-                    }
-                }
-            });
-        } else if (record.sequences && record.sequences.sequence) {
-            const seq = record.sequences.sequence;
-            if (Array.isArray(seq.nucleotides)) {  
-                seq.nucleotides.forEach(nucleotide => {
-                    const markerCode = seq.markercode || "N/A";
-                    const bin = record.bin_uri || "N/A";
-                    const sequence = nucleotide || "N/A";
-
-                    if (sequence !== "N/A" && markerCode !== "N/A" && isValidSequence(sequence)) {
-                        liste1[species].push({ markerCode, bin, sequence });
-                    }
-                });
-            } else {  
-                const markerCode = seq.markercode || "N/A";
-                const bin = record.bin_uri || "N/A";
-                const sequence = seq.nucleotides || "N/A";
-
-                if (sequence !== "N/A" && markerCode !== "N/A" && isValidSequence(sequence)) {
-                    liste1[species].push({ markerCode, bin, sequence });
-                }
+            if (markerCode === selectedMarker && sequence !== "N/A" && isValidSequence(sequence)) {
+              liste1[species].push({ markerCode, bin, sequence });
             }
+          });
+        } else { 
+          const markerCode = seq.markercode || "N/A";
+          const bin = record.bin_uri || "N/A";
+          const sequence = seq.nucleotides || "N/A";
+
+          if (markerCode === selectedMarker && sequence !== "N/A" && isValidSequence(sequence)) {
+            liste1[species].push({ markerCode, bin, sequence });
+          }
         }
-    });
+      });
+    } else if (record.sequences && record.sequences.sequence) {
+      const seq = record.sequences.sequence;
+      if (Array.isArray(seq.nucleotides)) {  
+        seq.nucleotides.forEach(nucleotide => {
+          const markerCode = seq.markercode || "N/A";
+          const bin = record.bin_uri || "N/A";
+          const sequence = nucleotide || "N/A";
 
+          if (markerCode === selectedMarker && sequence !== "N/A" && isValidSequence(sequence)) {
+            liste1[species].push({ markerCode, bin, sequence });
+          }
+        });
+      } else {  
+        const markerCode = seq.markercode || "N/A";
+        const bin = record.bin_uri || "N/A";
+        const sequence = seq.nucleotides || "N/A";
 
-    Object.keys(liste1).forEach(species => {
-        liste1[species] = liste1[species].filter(entry => entry.sequence.length >= minLength);
-    });
+        if (markerCode === selectedMarker && sequence !== "N/A" && isValidSequence(sequence)) {
+          liste1[species].push({ markerCode, bin, sequence });
+        }
+      }
+    }
+  });
 
+  Object.keys(liste1).forEach(species => {
+    liste1[species] = liste1[species].filter(entry => entry.sequence.length >= minLength);
+  });
 
-    return liste1;
+  return liste1;
 }
 
 
@@ -538,8 +546,13 @@ function formatBoldData(boldData) {
 
         const allMarkerCodesNA = liste1.every(entry => entry.markerCode === "N/A");
 
+        // Filtrage des séquences sur le marker code sélectionné
+        const filteredListe1 = selectedMarker === "all"
+            ? liste1
+            : liste1.filter(entry => entry.markerCode === selectedMarker);
+
         const groupedData = {};
-        liste1.forEach(({ markerCode, bin, sequence }) => {
+        filteredListe1.forEach(({ markerCode, bin, sequence }) => {
             const key = `${markerCode}-${bin}`;
             if (!groupedData[key]) {
                 groupedData[key] = {
@@ -709,7 +722,7 @@ mybutton.addEventListener("click", function(e) {
     e.preventDefault();
     window.scrollTo({
         top: 0,
-        behavior: "smooth" // Ajoute une animation douce
+        behavior: "smooth" 
     });
 });
 
