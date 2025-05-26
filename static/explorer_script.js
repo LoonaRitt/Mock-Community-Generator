@@ -1,6 +1,7 @@
 const flatTaxa = [];
 const selectedItems = new Set();
-
+let taxoTree = {};
+let boldData = {};
 
 function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
@@ -68,6 +69,7 @@ if (fullTaxonName.split(/\s+/).length >= 2) {
     const selectedMarker = document.getElementById("marker-select").value;
 
     let higherRank = null; 
+    let currentRank = null;
 
     Object.values(boldData).forEach(group => {
       const records = group.BOLD?.bold_records?.record || [];
@@ -86,15 +88,17 @@ if (fullTaxonName.split(/\s+/).length >= 2) {
           { rank: "species", value: taxonomy.species?.taxon?.name }
         ];
 
-        const inputNameLower = taxonName.toLowerCase();
-        for (let i = 0; i < taxoLevels.length; i++) {
-          const current = taxoLevels[i];
-          if (current.value && current.value.toLowerCase() === inputNameLower) {
-            const currentRank = current.rank.toUpperCase();
-            higherRank = taxoLevels[i - 1]?.value || "Not found";
-            break;
-          }
-        }
+const inputNameLower = taxonName.toLowerCase();
+
+for (let i = 0; i < taxoLevels.length; i++) {
+  const current = taxoLevels[i];
+  if (current.value && current.value.toLowerCase() === inputNameLower) {
+    currentRank = current.rank;
+    higherRank = taxoLevels[i - 1]?.value || "Not found";
+    break;
+  }
+}
+
 
 
         // Normalisation en tableau
@@ -182,12 +186,19 @@ if (fullTaxonName.split(/\s+/).length >= 2) {
       const familySequenceCounts = countSequencesPerFamily(taxoTree);
       const totalSequences = Object.values(genusSequenceCounts).reduce((sum, count) => sum + count, 0);
 
-if (totalSequences === 0) {
-  alert(`No sequences found for this taxon with the selected markercode. Please restart the search for the higher-level taxon: ${higherRank}`);
-  document.getElementById('loadingSpinner').style.display = 'none';
-  return;
-}
+      console.log("currentRank:", currentRank);
+      console.log("totalSequences:", totalSequences);
+
+      if (totalSequences === 0 && currentRank?.toLowerCase() === "genus") {
+        alert(`No sequences found for this genus with the selected markercode. Please restart the search for another genus or try with "all" markers.`);
+        document.getElementById('loadingSpinner').style.display = 'none';
+        return;
+      }
+
+
     renderTaxonomyTree(taxoTree, genusSequenceCounts, familySequenceCounts, fullTaxonName);
+    extractTaxonomyPaths(boldData);
+
   })
   .catch(error => {
     console.error("Erreur lors de la récupération des données BOLD :", error);
@@ -259,7 +270,6 @@ function extractTaxonomyPaths(boldData) {
   console.log(taxonomyPaths);
 }
 
-extractTaxonomyPaths(boldData);
 
 
 
@@ -268,23 +278,21 @@ function createTreeHTML(obj) {
 
   for (const key in obj) {
     const li = document.createElement("li");
+    li.textContent = key;
 
-    if (Array.isArray(obj[key])) {
-      const totalLength = obj[key].reduce((acc, seq) => {
-        const len = seq.nucleotides ? seq.nucleotides.length : 0;
-        return acc + len;
-      }, 0);
-      li.textContent = `${key} (Total length: ${totalLength} bp)`;
-    } else {
-      li.textContent = key;
-      li.appendChild(createTreeHTML(obj[key])); 
+    if (typeof obj[key] === 'object' && !Array.isArray(obj[key])) {
+      li.appendChild(createTreeHTML(obj[key]));
+    } else if (Array.isArray(obj[key])) {
+      const count = obj[key].length;
+      li.textContent += ` (${count} sequences)`;
     }
-    console.log(key)
+
     ul.appendChild(li);
   }
 
   return ul;
 }
+
 
 
 
