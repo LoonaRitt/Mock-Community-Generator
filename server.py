@@ -45,7 +45,7 @@ def get_gbif_data(taxon):
 def get_bold_data(taxon):
     url = f"https://v4.boldsystems.org/index.php/API_Public/combined?taxon={taxon}"
     try:
-        response = requests.get(url, timeout=10)
+        response = requests.get(url, timeout=10000)
         response.raise_for_status()
         data = xmltodict.parse(response.content)
 
