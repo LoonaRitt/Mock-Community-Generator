@@ -2,6 +2,7 @@ const flatTaxa = [];
 const selectedItems = new Set();
 let taxoTree = {};
 let boldData = {};
+let uniqueFamilies = [];
 
 function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
@@ -13,18 +14,38 @@ document.getElementById("marker-select").addEventListener("change", function () 
 });
 
 
-
 document.getElementById('searchButton').addEventListener('click', function () {
-const fullTaxonName = document.getElementById('taxonInput').value.trim();
-const taxonName = fullTaxonName.split(' ')[0]; 
+  const fullTaxonName = document.getElementById('taxonInput').value.trim();
+  const taxonName = fullTaxonName.split(' ')[0];
 
-if (fullTaxonName.split(/\s+/).length >= 2) {
-  alert("Search for the genus associated with your input. The species name will be displayed in blue in the tree.");
-}
+  const popup = document.createElement('div');
+  popup.textContent = "The search may take up to 15 minutes.";
+  popup.style.position = 'fixed';
+  popup.style.top = '60px';
+  popup.style.color = 'white';
+  popup.style.left = '50%';
+  popup.style.transform = 'translateX(-50%)';
+  popup.style.backgroundColor = 'RGB(56, 70, 75, 0.99)';
+  popup.style.padding = '12px 24px';
+  popup.style.border = '1px solid #4CAF50';
+  popup.style.borderRadius = '8px';
+  popup.style.zIndex = '1000';
+  popup.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.2)';
+  document.body.appendChild(popup);
+
+  setTimeout(() => {
+    popup.remove();
+  }, 5000);
+
+  if (fullTaxonName.split(/\s+/).length >= 2) {
+    alert("Search for the genus associated with your input. The species name will be displayed in blue in the tree.");
+  }
+
   if (!taxonName) {
     alert("Please enter a taxon name.");
     return;
   }
+
 
   document.getElementById('loadingSpinner').style.display = 'block';
 
@@ -65,18 +86,26 @@ if (fullTaxonName.split(/\s+/).length >= 2) {
   fetch(`/searchBOLD?taxon=${encodeURIComponent(taxonName)}`)
   .then(response => response.json())
   .then(boldData => {
+      console.log("Réponse BOLD brute :", boldData); 
     const taxoTree = {};
     const selectedMarker = document.getElementById("marker-select").value;
 
     let higherRank = null; 
     let currentRank = null;
+    const uniqueFamilies = new Set();
+    let taxonomyLineCount = 0;
 
     Object.values(boldData).forEach(group => {
       const records = group.BOLD?.bold_records?.record || [];
 
       records.forEach(record => {
         const taxonomy = record.taxonomy || {};
+        taxonomyLineCount++;
         const sequences = record.sequences?.sequence || [];
+
+        if (taxonomy.family?.taxon?.name) {
+          uniqueFamilies.add(taxonomy.family.taxon.name);
+        }
 
         const taxoLevels = [
           { rank: "kingdom", value: taxonomy.kingdom?.taxon?.name },
@@ -186,6 +215,8 @@ for (let i = 0; i < taxoLevels.length; i++) {
       const familySequenceCounts = countSequencesPerFamily(taxoTree);
       const totalSequences = Object.values(genusSequenceCounts).reduce((sum, count) => sum + count, 0);
 
+      console.log(`Nombre d'occurrences de "const taxonomy = record.taxonomy || {};" : ${taxonomyLineCount}`);
+      console.log("Familles uniques trouvées :", Array.from(uniqueFamilies));
       console.log("currentRank:", currentRank);
       console.log("totalSequences:", totalSequences);
 
@@ -196,6 +227,18 @@ for (let i = 0; i < taxoLevels.length; i++) {
       }
 
 
+      if (taxonomyLineCount === 0) {
+        const sortedFamilies = Array.from(uniqueFamilies).sort();
+        const message = `Too much data to process for the searched taxon.\n\nPlease run a new search using a lower taxonomic rank.`;
+
+        alert(message);
+
+        document.getElementById('loadingSpinner').style.display = 'none';
+
+        throw new Error("Limit reached");
+      }
+
+      
     renderTaxonomyTree(taxoTree, genusSequenceCounts, familySequenceCounts, fullTaxonName);
     extractTaxonomyPaths(boldData);
 
