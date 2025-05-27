@@ -113,7 +113,47 @@ def search_bold():
 
 
 
-import requests
+
+
+
+
+
+
+
+
+
+
+
+# Fonction pour récupérer les données de BOLD directement convertie
+def get_bold_raw_json(taxon):
+    url = f"https://v4.boldsystems.org/index.php/API_Public/combined?taxon={taxon}&format=json"
+    try:
+        response = requests.get(url, timeout=100000)
+        response.raise_for_status()
+        return response.json()  # <- Données brutes directement
+    except requests.RequestException as e:
+        return {"error": f"Erreur réseau pour {taxon} : {str(e)}"}
+    except Exception as e:
+        return {"error": f"Erreur de traitement JSON brut pour {taxon} : {str(e)}"}
+
+
+
+
+@app.route('/boldRaw', methods=['GET'])
+def bold_raw_data():
+    taxons = request.args.getlist('taxon')
+    results = {}
+
+    for taxon in taxons:
+        raw_data = get_bold_raw_json(taxon)
+        results[taxon] = raw_data
+
+    return jsonify(results)
+
+
+
+
+
 
 
 
