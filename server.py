@@ -41,43 +41,19 @@ def get_gbif_data(taxon):
 
 
 
-# Fonction pour récupérer les données de BOLD
+# Fonction pour récupérer les données BOLD
 def get_bold_data(taxon):
     url = f"https://v4.boldsystems.org/index.php/API_Public/combined?taxon={taxon}"
     try:
         response = requests.get(url, timeout=10000)
         response.raise_for_status()
         data = xmltodict.parse(response.content)
-
-        records = data.get("records", {}).get("record", [])
-        if isinstance(records, dict):
-            records = [records]  
-
-        extracted_data = []
-        for record in records:
-            bin_uri = record.get("bin_uri", "N/A")
-            nucleotides = record.get("sequences", {}).get("sequence", {}).get("nucleotides", "N/A")
-            species = record.get("taxonomy", {}).get("species", {}).get("taxon", {}).get("name", "N/A")
-            
-            extracted_data.append({
-                "BIN": bin_uri,
-                "Espèce": species,
-                "Sequence code barre": nucleotides
-            })
-        
-        return data
+        return data  
     except requests.RequestException as e:
         return {"error": f"Erreur lors de la récupération des données BOLD pour {taxon}: {str(e)}"}
     except Exception as e:
         return {"error": f"Erreur de conversion XML en JSON pour {taxon}: {str(e)}"}
 
-
-
-        return extracted_data if extracted_data else {"error": "Aucune donnée trouvée"}
-    except requests.RequestException as e:
-        return {"error": f"Erreur lors de la récupération des données BOLD pour {taxon}: {str(e)}"}
-    except Exception as e:
-        return {"error": f"Erreur de conversion XML en JSON pour {taxon}: {str(e)}"}
 
 
 
