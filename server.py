@@ -50,9 +50,13 @@ def get_bold_data(taxon):
         data = xmltodict.parse(response.content)
         return data  
     except requests.RequestException as e:
+        print(f"Erreur serveur : {e}")
         return {"error": f"Erreur lors de la récupération des données BOLD pour {taxon}: {str(e)}"}
     except Exception as e:
         return {"error": f"Erreur de conversion XML en JSON pour {taxon}: {str(e)}"}
+    except Exception as e:
+        print(f"Erreur serveur : {e}")
+        return {"error": f"Erreur serveur côté BOLD : {str(e)}"}
 
 
 
