@@ -246,7 +246,7 @@ for (let i = 0; i < taxoLevels.length; i++) {
   .catch(error => {
     console.error("Erreur lors de la récupération des données BOLD :", error);
 
-    const message = `An error occurred while retrieving data from BOLD.\n\nPlease try again later or check the taxon name.`;
+    const message = `An error occurred while retrieving data from BOLD.\n\nPlease try again with a lower taxonomic rank name.`;
     alert(message);
 
     document.getElementById('loadingSpinner').style.display = 'none';
