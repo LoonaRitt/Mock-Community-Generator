@@ -264,7 +264,6 @@ function displayData(data) {
 
 
 
-
 function createListe1(boldData) {
   console.log('Création de liste1 pour les données BOLD'); 
   const markerSelect = document.getElementById('marker-select');
@@ -295,9 +294,9 @@ function createListe1(boldData) {
   let liste1 = {}; 
 
   records.forEach(record => {
-    const species = record.taxonomy?.species?.taxon?.name || "N/A";
+    const species = record.taxonomy?.species?.taxon?.name;
 
-    if (species === "N/A") {
+    if (!species || species === "N/A") {
       return; 
     }
 
@@ -787,5 +786,3 @@ searchButton.onclick = () => {
     hideLoadingIndicator();
   });
 };
-
-
