@@ -1,17 +1,14 @@
 from flask import Flask, request, jsonify, render_template, send_file
 import requests
-import xmltodict
 import io
 import json
 import numpy as np
 from subprocess import run
 from tempfile import NamedTemporaryFile
-
-
+from lxml import etree  
+from lxml.etree import tostring
 
 app = Flask(__name__)
-
-
 
 
 # Fonction pour récupérer les données occurrences de GBIF
@@ -39,26 +36,43 @@ def get_gbif_data(taxon):
 
 
 
-
-
-# Fonction pour récupérer les données BOLD
 def get_bold_data(taxon):
     url = f"https://v4.boldsystems.org/index.php/API_Public/combined?taxon={taxon}"
     try:
         response = requests.get(url, timeout=10000)
         response.raise_for_status()
-        data = xmltodict.parse(response.content)
-        return data  
+
+        parser = etree.XMLParser(recover=True)
+        root = etree.fromstring(response.content, parser=parser)
+
+        records = root.xpath("//record")
+        all_records = []
+
+        def xml_to_dict(element):
+            data = {}
+            for child in element:
+                if len(child):  # si l'enfant a ses propres enfants
+                    data[child.tag] = xml_to_dict(child)
+                else:
+                    data[child.tag] = child.text or ""
+            return data
+
+        for record in records:
+            record_dict = xml_to_dict(record)
+            all_records.append(record_dict)
+
+        return {
+            "bold_records": {
+                "record": all_records
+            }
+        } if all_records else {"error": "Aucune donnée trouvée"}
+
     except requests.RequestException as e:
-        print(f"Erreur serveur : {e}")
         return {"error": f"Erreur lors de la récupération des données BOLD pour {taxon}: {str(e)}"}
+    except etree.XMLSyntaxError as e:
+        return {"error": f"Erreur de parsing XML avec lxml pour {taxon}: {str(e)}"}
     except Exception as e:
-        return {"error": f"Erreur de conversion XML en JSON pour {taxon}: {str(e)}"}
-    except Exception as e:
-        print(f"Erreur serveur : {e}")
-        return {"error": f"Erreur serveur côté BOLD : {str(e)}"}
-
-
+        return {"error": f"Erreur inattendue lors du traitement des données BOLD pour {taxon}: {str(e)}"}
 
 
 
@@ -93,47 +107,7 @@ def search_bold():
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-# Fonction pour récupérer les données de BOLD directement convertie
-def get_bold_raw_json(taxon):
-    url = f"https://v4.boldsystems.org/index.php/API_Public/combined?taxon={taxon}&format=json"
-    try:
-        response = requests.get(url, timeout=100000)
-        response.raise_for_status()
-        return response.json()  # <- Données brutes directement
-    except requests.RequestException as e:
-        return {"error": f"Erreur réseau pour {taxon} : {str(e)}"}
-    except Exception as e:
-        return {"error": f"Erreur de traitement JSON brut pour {taxon} : {str(e)}"}
-
-
-
-
-@app.route('/boldRaw', methods=['GET'])
-def bold_raw_data():
-    taxons = request.args.getlist('taxon')
-    results = {}
-
-    for taxon in taxons:
-        raw_data = get_bold_raw_json(taxon)
-        results[taxon] = raw_data
-
-    return jsonify(results)
-
-
-
-
-
+import requests
 
 
 
@@ -210,7 +184,7 @@ def match_taxon():
         'scientificName': gbif_data.get('scientificName'),
         'usageKey': usage_key,
         'rank': gbif_data.get('rank'),
-        'children': children  
+        'children': children 
     })
 
 
