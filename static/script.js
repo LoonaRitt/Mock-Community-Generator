@@ -151,7 +151,12 @@ function displayData(data) {
     const allSpeciesContainer = document.createElement('div');
     allSpeciesContainer.className = 'all-species-container';
 
+
     for (const species in speciesData) {
+        if (species === "N/A") {
+          continue; 
+        }
+
       const speciesSection = document.createElement('div');
       speciesSection.className = 'species-section';
 
@@ -482,6 +487,9 @@ function formatBoldData(boldData) {
         if (!speciesData[species]) {
             speciesData[species] = [];
         }
+        if (species === "N/A") {
+          return; 
+        }
 
     const sequences = record.sequences?.sequence;
 
@@ -786,3 +794,5 @@ searchButton.onclick = () => {
     hideLoadingIndicator();
   });
 };
+
+
