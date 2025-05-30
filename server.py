@@ -1,14 +1,17 @@
 from flask import Flask, request, jsonify, render_template, send_file
 import requests
+import xmltodict
 import io
 import json
 import numpy as np
 from subprocess import run
 from tempfile import NamedTemporaryFile
-from lxml import etree  
-from lxml.etree import tostring
+
+
 
 app = Flask(__name__)
+
+
 
 
 # Fonction pour récupérer les données occurrences de GBIF
@@ -36,43 +39,46 @@ def get_gbif_data(taxon):
 
 
 
+
+
+# Fonction pour récupérer les données de BOLD
 def get_bold_data(taxon):
     url = f"https://v4.boldsystems.org/index.php/API_Public/combined?taxon={taxon}"
     try:
         response = requests.get(url, timeout=10000)
         response.raise_for_status()
+        data = xmltodict.parse(response.content)
 
-        parser = etree.XMLParser(recover=True)
-        root = etree.fromstring(response.content, parser=parser)
+        records = data.get("records", {}).get("record", [])
+        if isinstance(records, dict):
+            records = [records]  
 
-        records = root.xpath("//record")
-        all_records = []
-
-        def xml_to_dict(element):
-            data = {}
-            for child in element:
-                if len(child):  # si l'enfant a ses propres enfants
-                    data[child.tag] = xml_to_dict(child)
-                else:
-                    data[child.tag] = child.text or ""
-            return data
-
+        extracted_data = []
         for record in records:
-            record_dict = xml_to_dict(record)
-            all_records.append(record_dict)
-
-        return {
-            "bold_records": {
-                "record": all_records
-            }
-        } if all_records else {"error": "Aucune donnée trouvée"}
-
+            bin_uri = record.get("bin_uri", "N/A")
+            nucleotides = record.get("sequences", {}).get("sequence", {}).get("nucleotides", "N/A")
+            species = record.get("taxonomy", {}).get("species", {}).get("taxon", {}).get("name", "N/A")
+            
+            extracted_data.append({
+                "BIN": bin_uri,
+                "Espèce": species,
+                "Sequence code barre": nucleotides
+            })
+        
+        return data
     except requests.RequestException as e:
         return {"error": f"Erreur lors de la récupération des données BOLD pour {taxon}: {str(e)}"}
-    except etree.XMLSyntaxError as e:
-        return {"error": f"Erreur de parsing XML avec lxml pour {taxon}: {str(e)}"}
     except Exception as e:
-        return {"error": f"Erreur inattendue lors du traitement des données BOLD pour {taxon}: {str(e)}"}
+        return {"error": f"Erreur de conversion XML en JSON pour {taxon}: {str(e)}"}
+
+
+
+        return extracted_data if extracted_data else {"error": "Aucune donnée trouvée"}
+    except requests.RequestException as e:
+        return {"error": f"Erreur lors de la récupération des données BOLD pour {taxon}: {str(e)}"}
+    except Exception as e:
+        return {"error": f"Erreur de conversion XML en JSON pour {taxon}: {str(e)}"}
+
 
 
 
@@ -184,7 +190,7 @@ def match_taxon():
         'scientificName': gbif_data.get('scientificName'),
         'usageKey': usage_key,
         'rank': gbif_data.get('rank'),
-        'children': children 
+        'children': children  
     })
 
 
